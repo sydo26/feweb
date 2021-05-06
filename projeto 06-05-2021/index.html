@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contate-nos</title>
+
+    <style>
+      div {
+        display: flex;
+        width: 400px;
+        flex-wrap: wrap;
+        height: auto;
+      }
+
+      label {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <form>
+      <div>
+        <label for="name">Nome completo</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          value=""
+          placeholder="Digite seu nome completo"
+        />
+      </div>
+      <div>
+        <label for="mail">E-mail</label>
+        <input
+          id="mail"
+          name="mail"
+          type="text"
+          value=""
+          placeholder="Digite seu e-mail"
+        />
+      </div>
+      <div>
+        <label for="msg">Mensagem</label>
+        <textarea
+          id="msg"
+          name="msg"
+          placeholder="Digite sua mensagem"
+        ></textarea>
+      </div>
+      <div>
+        <button>Enviar</button>
+      </div>
+    </form>
+
+    <script>
+      const form = document.querySelector("form");
+
+      const callBack = function (event) {
+        event.preventDefault(); // garante que o evento não vai ser executado
+
+        console.log("enviando");
+
+        const body = {
+          mail: event.target.mail.value,
+          msg: event.target.msg.value,
+          name: event.target.name.value,
+        };
+
+        // enviar o body para o endereço: localhost:3000/sendEmail
+        // enviar como post
+
+        fetch("http://localhost:3000/sendEmail", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => console.log(res));
+      };
+
+      form.addEventListener("submit", callBack);
+    </script>
+  </body>
+</html>
