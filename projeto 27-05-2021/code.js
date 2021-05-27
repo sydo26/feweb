@@ -2,18 +2,13 @@ const canvas = document.querySelector("canvas");
 
 const context = canvas.getContext("2d");
 
-const marcusPng = new Image();
-
-marcusPng.src =
-  "https://cdn.discordapp.com/attachments/735961366355116113/847594645889220649/DPMZTcaW0AE2U6R.jpg";
-
 function Player(color, p2 = false) {
   this.dir = 0;
 
   this.color = color;
 
   this.speed = 3;
-  this.w = 50;
+  this.w = 20;
   this.h = 200;
 
   this.x = p2 ? canvas.width - 20 - this.w : 20;
@@ -52,7 +47,7 @@ function Player(color, p2 = false) {
 function Ball(color) {
   this.spawned = false;
   this.size = 25;
-  this.speed = 2;
+  this.speed = 6;
   this.dirx = 0;
   this.diry = 0;
   this.x = canvas.width / 2 - this.size / 2;
@@ -70,14 +65,29 @@ function Ball(color) {
   this.draw = () => {
     context.translate(this.x, this.y);
     context.beginPath();
-    // context.drawImage(marcusPng, 0, 0, this.size, this.size);
     context.fillStyle = "purple";
     context.fillRect(0, 0, this.size, this.size);
     context.closePath();
     context.translate(-this.x, -this.y);
   };
 
-  this.update = () => {
+  this.update = (p1, p2) => {
+    const yP1Ok = p1.y < this.y + this.size && p1.y + p1.h > this.y;
+    const yP2Ok = p2.y < this.y + this.size && p2.y + p2.h > this.y;
+
+    // player1
+    if (p1.w + p1.x >= this.x && yP1Ok) {
+      this.dirx = -this.dirx;
+    }
+
+    // player2
+    // if (p2.x >= this.x + this.size && yP2Ok) {
+    //   console.log("ok");
+    // }
+    if (p2.x <= this.x + this.size && yP2Ok) {
+      this.dirx = -this.dirx;
+    }
+
     if (this.y <= 10 || this.y >= canvas.height - 10 - this.size) {
       this.diry = -this.diry;
     }
@@ -85,6 +95,14 @@ function Ball(color) {
     if (this.x <= 10 || this.x >= canvas.width - 10 - this.size) {
       this.dirx = -this.dirx;
     }
+
+    // let speed = this.speed;
+    // if (this.dirx === -1 && yOk) {
+    //   console.log("a");
+    //   let value = this.x - p1.x + p1.h;
+    //   console.log("Valor:", value);
+    //   speed = this.x - speed < p1.x + p1.h ? value : speed;
+    // }
 
     this.x += this.speed * this.dirx;
     this.y += this.speed * this.diry;
@@ -99,24 +117,19 @@ const ball = new Ball("purple");
 function draw() {
   context.fillStyle = "#282c34";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  // context.filter = "blur(5px)";
-  // context.drawImage(background, -200, -50);
-  // context.filter = "none";
   player1.draw();
   player2.draw();
   ball.draw();
 }
 
 const update = () => {
-  ball.update();
+  ball.update(player1, player2);
   player1.update();
   player2.update();
   draw();
 
-  // requestAnimationFrame(update);
+  requestAnimationFrame(update);
 };
-
-setInterval(update, 0);
 
 const handleKeyPressed = ({ key }) => {
   console.log(key);
@@ -156,3 +169,6 @@ window.addEventListener("keyup", handleKeyUp);
 // s = 83
 
 update();
+// setInterval(() => {
+//   update();
+// }, 200);
