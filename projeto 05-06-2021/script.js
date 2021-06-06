@@ -72,6 +72,20 @@ function Ball(color, callback) {
   };
 
   this.draw = () => {
+    if (!this.spawned) {
+      let text = "Press Space";
+
+      context.font = `bolder 32px Segoe UI`;
+      let textWidth = context.measureText(text).width;
+      context.fillStyle = "white";
+      context.save();
+      let width = canvas.width / 2 - textWidth / 2;
+      let height = canvas.height / 2 + 200;
+      context.translate(width, height);
+
+      context.fillText("Press SPACE", 0, 0);
+      context.restore();
+    }
     context.translate(this.x, this.y);
     context.beginPath();
     context.fillStyle = "purple";
