@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projeto 17-06</title>
+    <style>
+      * {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      html,
+      body {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+      }
+
+      input {
+        padding: 10px;
+        font-size: 18px;
+        border-radius: 5px;
+      }
+
+      ul {
+        list-style: none;
+        float: left;
+        margin: 0;
+        padding: 0;
+        max-width: 280px;
+      }
+
+      ul > li {
+        display: inline-block;
+        width: 280px;
+        height: auto;
+        padding: 12px 8px;
+        max-width: 280px;
+        background-color: rgba(240, 240, 240, 1);
+      }
+
+      div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 280px;
+        flex-wrap: wrap;
+        height: auto;
+        margin: 20px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input
+        id="search"
+        type="text"
+        value=""
+        placeholder="Procure seu produto"
+      />
+      <h3>Produtos encontrados: 0</h3>
+      <ul></ul>
+    </div>
+
+    <script>
+      //   change, keydown, keyup, keypress
+
+      const search = document.querySelector("#search");
+
+      const ul = document.querySelector("ul");
+
+      const h3 = document.querySelector("h3");
+
+      function createProductModel(name, id) {
+        const li = document.createElement("li");
+        li.id = "products_" + id;
+        li.textContent = name;
+        return li;
+      }
+
+      function LiveSearch() {
+        this.cancelObject = null; // de início ele é nulo
+
+        this.fetch = (url, args) => {
+          // mas se ele chamar um fetch ele vai ter valor
+          if (this.cancelObject) {
+            // se for não nulo ele executa isso
+            this.cancelObject.abort();
+            this.cancelObject = null;
+          }
+
+          this.cancelObject = new AbortController();
+
+          return fetch(url, {
+            ...args,
+            signal: this.cancelObject.signal,
+          });
+        };
+      }
+
+      const liveSearch = new LiveSearch();
+
+      async function updateSearch(e) {
+        h3.textContent = "Procurando...";
+        const products = await liveSearch
+          .fetch("http://localhost:3000/products?q=" + search.value, {
+            method: "GET",
+          })
+          .then((res) => res.json())
+          .catch((err) => {
+            console.log(`ERROR: ${err}`);
+          });
+
+        if (products) {
+          //   console.log(products);
+          ul.innerHTML = "";
+          h3.textContent = "Produtos encontrados: " + products.length;
+          products.forEach(({ name, id }) => {
+            const li = createProductModel(name, id);
+            ul.appendChild(li);
+          });
+        }
+      }
+
+      search.addEventListener("keyup", updateSearch);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Arroz"
+    },
+    {
+      "id": 2,
+      "name": "Feijão"
+    },
+    {
+      "id": 3,
+      "name": "Sushi"
+    },
+    {
+      "id": 4,
+      "name": "Macarrão"
+    },
+    {
+      "id": 5,
+      "name": "Pepino"
+    },
+    {
+      "id": 6,
+      "name": "Peixe"
+    },
+    {
+      "id": 7,
+      "name": "Torta"
+    },
+    {
+      "id": 8,
+      "name": "Pizza"
+    },
+    {
+      "id": 9,
+      "name": "Galinha frita"
+    },
+    {
+      "id": 10,
+      "name": "Pippos"
+    },
+    {
+      "id": 11,
+      "name": "Coca-cola"
+    }
+  ]
+}

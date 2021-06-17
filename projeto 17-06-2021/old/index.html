@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listar produtos com live search</title>
+
+    <style>
+      * {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      html,
+      body {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+      }
+
+      input {
+        padding: 10px;
+        font-size: 18px;
+        border-radius: 5px;
+      }
+
+      ul {
+        list-style: none;
+        float: left;
+        margin: 0;
+        padding: 0;
+        max-width: 280px;
+      }
+
+      ul > li {
+        display: inline-block;
+        width: 280px;
+        height: auto;
+        padding: 12px 8px;
+        max-width: 280px;
+        background-color: rgba(240, 240, 240, 1);
+      }
+
+      div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 280px;
+        flex-wrap: wrap;
+        height: auto;
+        margin: 20px auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input
+        id="search"
+        type="text"
+        value=""
+        placeholder="Procure seu produto"
+      />
+      <h3>Produtos encontrados: 0</h3>
+      <ul></ul>
+    </div>
+
+    <script>
+      function LiveSearch() {
+        this.cancelToken = null;
+
+        this.fetch = async (url, args) => {
+          if (this.cancelToken) {
+            this.cancelToken.abort();
+            this.cancelToken = null;
+          }
+
+          this.cancelToken = new AbortController();
+
+          this.cancelToken.signal.addEventListener("abort", () => {
+            console.log("Request cancelado");
+          });
+
+          return await fetch(url, {
+            ...args,
+            signal: this.cancelToken.signal,
+          });
+        };
+      }
+
+      const search = document.querySelector("#search");
+      const products = document.querySelector("ul");
+      const message = document.querySelector("h3");
+
+      const liveSearch = new LiveSearch();
+
+      function generateProductModel(id, name) {
+        const li = document.createElement("li");
+        li.textContent = name;
+        li.id = "product_" + id;
+
+        return li;
+      }
+
+      async function updateSearch() {
+        message.textContent = "Procurando produtos...";
+        const result = await liveSearch
+          .fetch(`http://localhost:3000/products?q=${search.value}`, {
+            method: "GET",
+          })
+          .then((res) => res.json())
+          .catch((err) => {
+            if (err.code !== 20) console.log(err);
+          });
+
+        if (result) {
+          message.textContent = "Produtos encontrados: " + result.length;
+          console.log(result);
+          products.innerHTML = "";
+          result.forEach(({ id, name }) => {
+            products.appendChild(generateProductModel(id, name));
+          });
+        } else {
+          message.textContent = "Produtos encontrados: 0";
+        }
+      }
+
+      search.addEventListener("keydown", updateSearch);
+
+      updateSearch();
+    </script>
+  </body>
+</html>
